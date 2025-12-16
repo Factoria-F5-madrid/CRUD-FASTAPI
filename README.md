@@ -24,25 +24,10 @@ FastAPI es un moderno y rápido (de alto rendimiento) framework web para constru
 
 🔧 FastAPI es ideal para microservicios, aplicaciones serverless, y APIs que requieren alto rendimiento y facilidad de desarrollo.
 
-## 2. Instalación y Configuración
-
-### Instalar FastAPI y dependencias
-
-1. Crear un entorno virtual:
-   ```
-   python -m venv venv
-   source venv/bin/activate
-   ```
-
-2. Instalar FastAPI y dependencias:
-   ```
-   pip install fastapi[all] sqlalchemy
-   ```
-
-## 3. Estructura de Archivos y Carpetas
+## 2. Estructura de Archivos y Carpetas
 
 ```plaintext
-fastapi_app/
+book_crud/
 │
 ├── main.py                   
 ├── config
@@ -69,9 +54,10 @@ fastapi_app/
 │   ├── __init__.py
 │   └── libro_controller.py   
 │
-└── db.sqlite3   
+├── .env #opcional
+│
+└── db.sqlite3 #Este archivo se creará solo ;)
 ```
-
 
 - `venv/`: Directorio del entorno virtual de Python.
 - `__init__.py`: Archivo que convierte el directorio en un paquete Python.
@@ -85,21 +71,35 @@ fastapi_app/
 - `requirements.txt`: Lista todas las dependencias del proyecto para una fácil instalación.
 - `README.md`: Proporciona documentación e instrucciones para el proyecto (este archivo).
 
-### Configurar el proyecto
+## 3. Instalación y Configuración
 
 1. Crear la estructura de directorios:
    ```
-   mkdir mi_app_crud
-   cd mi_app_crud
+   mkdir book_crud
+   cd book_crud
+   ```
+### Instalar FastAPI y dependencias
+
+2. Crear un entorno virtual:
+   ```
+   python -m venv venv
+   source venv/bin/activate
+   ```
+
+3. Instalar FastAPI y dependencias:
+   ```
+   pip install fastapi[all] sqlalchemy
    ```
 
    Crea las carpetas que necesites y dentro los archivos que vayas a utilizar, la arquitectura de tu proyecto puede cambiar, sin embargo recuerda que queremos **escalabilidad**, por lo que necesitamos dividir la lógica de los distintos servicios, y la conexiones con otras partes de la aplicación.
 
-2. Configurar las variables de entorno `config/config_variables.py`:
+2. Configurar las variables de entorno y usar el diectorio y archivo `config/config_variables.py`:
 **Install pydantic_settings**
     ```
     pip install pydantic-settings
     ```
+   Pydantic es una librería de Python que se utiliza para validar, convertir y estructurar datos usando tipado de Python. Pydantic se asegura de que los datos que entran y salen de tu aplicación tengan la forma, el tipo y el contenido correcto.
+    
     ```python
     from pydantic_settings import BaseSettings
 
@@ -112,8 +112,40 @@ fastapi_app/
     settings = Settings()
     ```
 
+    **Pero** si quisieramos hacer nuestro entorno más seguro podriamos usar el paquete `python-dotenv` y un archivo `.env`:
 
-3. Configurar la base de datos en `database/database.py`:
+    ```python
+    pip install python-dotenv
+    ```
+   Luego en tu archivo `.env`:
+   
+    ```python
+    DB_USER=nombre-del-ddbb-user
+    DB_PASSWORD=contraseña-ddbb
+    DB_HOST=ddbb-host
+    DB_NAME=nombre-ddbb
+    ```
+    Entonces el archivo `config/config_variables.py` se veria de esta manera:
+   ```python
+      # config/config_variables.py
+   
+      import os
+      from dotenv import load_dotenv
+      
+      # Cargar variables del .env
+      load_dotenv()
+      
+      class Settings:
+          DB_USER: str = os.getenv("DB_USER", "default_user")
+          DB_PASSWORD: str = os.getenv("DB_PASSWORD", "default_password")
+          DB_HOST: str = os.getenv("DB_HOST", "localhost")
+          DB_NAME: str = os.getenv("DB_NAME", "test_db")
+      
+      settings = Settings()
+   ```
+   
+
+4. Configurar la base de datos en `database/database.py`:
    ```python
    # database/database.py
 
@@ -134,7 +166,7 @@ fastapi_app/
     # Crea un engine
     engine = create_engine(DATABASE_URL)
 
-    # Cre una clase para configurar la sesión
+    # Crea una clase para configurar la sesión
     Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
     # Crea una clase base para los modelos
@@ -297,5 +329,3 @@ app.include_router(router, prefix="/v1")
 - [Tutorial de SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/tutorial.html)
 - [Guía de despliegue de FastAPI](https://fastapi.tiangolo.com/deployment/)
 - [Curso en video de FastAPI](https://www.youtube.com/watch?v=7t2alSnE2-I)
-
-¡Feliz desarrollo con FastAPI! 🚀
