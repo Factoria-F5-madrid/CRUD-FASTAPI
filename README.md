@@ -48,7 +48,7 @@ book_crud/
 |
 ├── routes
 │   ├── __init__.py
-│   └── schema_model.py         
+│   └── routes.py         
 │
 ├── controllers/
 │   ├── __init__.py
@@ -431,7 +431,7 @@ def read_item(item_id: int, db: Session = Depends(get_db)):
 ### Archivo principal app.py (`app.py`)
 ```python
 from fastapi import FastAPI
-from routes.crud_routes import router
+from routes.routes import router
 
 app = FastAPI()
 
