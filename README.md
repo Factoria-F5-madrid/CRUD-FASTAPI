@@ -212,8 +212,8 @@ book_crud/
 
 ## 6. Comandos Esenciales
 
-- `fastapi run app.py`: Inicia el servidor de desarrollo
-- `uvicorn app.main:app --reload`: Inicia el servidor de desarrollo
+- `fastapi run main.py`: Inicia el servidor de desarrollo
+- `uvicorn main:app --reload`: Inicia el servidor de desarrollo
 - `pytest`: Ejecuta las pruebas (si están configuradas)
 - `alembic revision --autogenerate`: Genera una migración de base de datos (si se usa Alembic)
 - `alembic upgrade head`: Aplica las migraciones pendientes
