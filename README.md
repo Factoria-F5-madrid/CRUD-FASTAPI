@@ -27,36 +27,36 @@ FastAPI es un moderno y rápido (de alto rendimiento) framework web para constru
 ## 2. Estructura de Archivos y Carpetas
 
 ```plaintext
-   book_crud/
-   │
-   ├── main.py                   
-   ├── config
-   │   ├── __init__.py
-   │   └── config_variables.py
-   |
-   ├── database
-   │   ├── __init__.py
-   │   └── database.py
-   |                   
-   ├── models/
-   │   ├── __init__.py
-   │   └── libro_model.py
-   |
-   ├── schemas
-   │   ├── __init__.py
-   │   └── libro_schema.py
-   |
-   ├── routes
-   │   ├── __init__.py
-   │   └── routes.py         
-   │
-   ├── controllers/
-   │   ├── __init__.py
-   │   └── libro_controller.py   
-   │
-   ├── .env #opcional
-   │
-   └── db.sqlite3 #Este archivo se creará solo ;)
+book_crud/
+│
+├── main.py                   
+├── config
+│   ├── __init__.py
+│   └── config_variables.py
+|
+├── database
+│   ├── __init__.py
+│   └── database.py
+|                   
+├── models/
+│   ├── __init__.py
+│   └── libro_model.py
+|
+├── schemas
+│   ├── __init__.py
+│   └── libro_schema.py
+|
+├── routes
+│   ├── __init__.py
+│   └── routes.py         
+│
+├── controllers/
+│   ├── __init__.py
+│   └── libro_controller.py   
+│
+├── .env #opcional
+│
+└── db.sqlite3 #Este archivo se creará solo ;)
 ```
 
 - `venv/`: Directorio del entorno virtual de Python.
@@ -74,77 +74,88 @@ FastAPI es un moderno y rápido (de alto rendimiento) framework web para constru
 ## 3. Instalación y Configuración
 
 1. Crear la estructura de directorios:
-   ```
-   mkdir book_crud
-   cd book_crud
-   ```
+```
+mkdir book_crud
+cd book_crud
+```
 ### Instalar FastAPI y dependencias
 
 2. Crear un entorno virtual:
-   ```
-   python -m venv venv
-   source venv/bin/activate
-   ```
+```
+python -m venv venv
+source venv/bin/activate
+```
 
 3. Instalar FastAPI y dependencias:
-   ```
-   pip install fastapi[all] sqlalchemy
-   ```
-   si no te permite utilizar `[all]` entonces instala:
+```
+pip install fastapi[all] sqlalchemy
+```
+si no te permite utilizar `[all]` entonces instala:
 
-   ```
-   pip install fastapi sqlalchemy uvicorn
-   ```
+```
+pip install fastapi sqlalchemy uvicorn
+```
 
-   Crea las carpetas que necesites y dentro los archivos que vayas a utilizar, la arquitectura de tu proyecto puede cambiar, sin embargo recuerda que queremos **escalabilidad**, por lo que necesitamos dividir la lógica de los distintos servicios, y la conexiones con otras partes de la aplicación, es decir crea las carpetas y archivos (los archivos son los que tienen extensiones como ".py", las carpetas no tienen extensión):
+Crea las carpetas que necesites y dentro los archivos que vayasa utilizar, la arquitectura de tu proyecto puede cambiar, sinembargo recuerda que queremos **escalabilidad**, por lo quenecesitamos dividir la lógica de los distintos servicios, y laconexiones con otras partes de la aplicación, es decir crea lascarpetas y archivos (los archivos son los que tienen extensionescomo ".py", las carpetas no tienen extensión):
 
 ```plaintext
-     book_crud/
-     │
-     ├── main.py                   
-     ├── config
-     │   ├── __init__.py
-     │   └── config_variables.py
-     |
-     ├── database
-     │   ├── __init__.py
-     │   └── database.py
-     |                   
-     ├── models/
-     │   ├── __init__.py
-     │   └── libro_model.py
-     |
-     ├── schemas
-     │   ├── __init__.py
-     │   └── libro_schema.py
-     |
-     ├── routes
-     │   ├── __init__.py
-     │   └── routes.py         
-     │
-     ├── controllers/
-     │   ├── __init__.py
-     │   └── libro_controller.py   
-     │ 
-     └──.env #opcional
+book_crud/
+│
+├── main.py                   
+├── config
+│  ├── __init__.py
+│  └── config_variables.py
+|
+├── database
+│   ├── __init__.py
+│   └── database.py
+|                   
+├── models/
+│   ├── __init__.py
+│   └── libro_model.py
+|
+├── schemas
+│   ├── __init__.py
+│   └── libro_schema.py
+|
+├── routes
+│   ├── __init__.py
+│   └── routes.py         
+│
+├── controllers/
+│   ├── __init__.py
+│   └── libro_controller.py   
+│ 
+└──.env #opcional
 ```
 
 2. Configurar las variables de entorno y usar el diectorio y archivo `config/config_variables.py`:
-**Install pydantic_settings**
-    ```
-    pip install pydantic-settings
-    ```
+
+   Para eso primero debemos instalar la dependencia pertinente, en este caso **pydantic_settings**, librería que nos da una serie de herramientas para permitir que nuestro sistema pueda acceder a información pertinente durante el desarrollo.
+   
    Pydantic es una librería de Python que se utiliza para validar, convertir y estructurar datos usando tipado de Python. Pydantic se asegura de que los datos que entran y salen de tu aplicación tengan la forma, el tipo y el contenido correcto.
+   
+   ```
+   pip install pydantic-settings
+   ```
+
+   Ahora para guardar estas dependencias con sus versiones en un archivo `requirements.txt` hacemos:
+
+   ```bash
+   pip freeze >> requirements.txt
+   ```
+
+   Nos dirigimos al directorio `config/` y dentro de esta carpeto nos dirigimos al archivo `config_variables.py` y escribimos:
     
     ```python
     from pydantic_settings import BaseSettings
-
+   
     class Settings(BaseSettings):
         DB_USER: str = "nombre-del-ddbb-user"
         DB_PASSWORD: str = "contraseña-ddbb"
         DB_HOST: str = "ddbb-host"
         DB_NAME: str = "nombre-ddbb"
-
+   
     settings = Settings()
     ```
 
@@ -161,64 +172,90 @@ FastAPI es un moderno y rápido (de alto rendimiento) framework web para constru
     DB_HOST=ddbb-host
     DB_NAME=nombre-ddbb
     ```
-    Entonces el archivo `config/config_variables.py` se veria de esta manera:
+   Entonces el archivo `config/config_variables.py` se veria de esta manera:
+    
    ```python
-      # config/config_variables.py
+    # config/config_variables.py
    
-      import os
-      from dotenv import load_dotenv
+    import os
+    from dotenv import load_dotenv
       
-      # Cargar variables del .env
-      load_dotenv()
+    # Cargar variables del .env
+    load_dotenv()
       
-      class Settings:
-          DB_USER: str = os.getenv("DB_USER", "default_user")
-          DB_PASSWORD: str = os.getenv("DB_PASSWORD", "default_password")
-          DB_HOST: str = os.getenv("DB_HOST", "localhost")
-          DB_NAME: str = os.getenv("DB_NAME", "test_db")
+    class Settings:
+        DB_USER: str = os.getenv("DB_USER", "default_user")
+        DB_PASSWORD: str = os.getenv("DB_PASSWORD","default_password")
+        DB_HOST: str = os.getenv("DB_HOST", "localhost")
+        DB_NAME: str = os.getenv("DB_NAME", "test_db")
       
-      settings = Settings()
+    settings = Settings()
    ```
    
 
 4. Configurar la base de datos en `database/database.py`:
    ```python
    # database/database.py
-
-    from sqlalchemy import create_engine
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import sessionmaker
-    from config.config_variables import settings
-
+   
+   from sqlalchemy import create_engine
+   from sqlalchemy.ext.declarative import declarative_base
+   from sqlalchemy.orm import sessionmaker
+   from config.config_variables import settings
+   
     # Variables de entorno para no exponer información sensible
-    DB_USER = settings.DB_USER
-    DB_PASSWORD = settings.DB_PASSWORD
-    DB_HOST = settings.DB_HOST
-    DB_NAME = settings.DB_NAME
-
-    # Conexión con la base de datos
-    DATABASE_URL = "mysql+pymysql://"+DB_USER+":"+DB_PASSWORD+"@"+DB_HOST+"/"+DB_NAME+""  # MySQL
-
-    # Crea un engine
-    engine = create_engine(DATABASE_URL)
-
-    # Crea una clase para configurar la sesión
-    Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-    # Crea una clase base para los modelos
-    Base = declarative_base()
-
-    # función para obtener la sesión de la base de datos
-    def get_db():
-        db = Session()  # Crea una nueva sesión
-        try:
-            yield db  # Usa la sesión
-        finally:
-            db.close()  # Cierra la sesión al terminar
-
+   DB_USER = settings.DB_USER
+   DB_PASSWORD = settings.DB_PASSWORD
+   DB_HOST = settings.DB_HOST
+   DB_NAME = settings.DB_NAME
+   
+   # Conexión con la base de datos
+   DATABASE_URL = "mysql+pymysql://"+DB_USER+":"+DB_PASSWORD+"@"+DB_HOST+"/"+DB_NAME+""  # MySQL
+   
+   # Crea un engine
+   engine = create_engine(DATABASE_URL)
+   
+   # Crea una clase para configurar la sesión
+   Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+   
+   # Crea una clase base para los modelos
+   Base = declarative_base()
+   
+   # función para obtener la sesión de la base de datos
+   def get_db():
+       db = Session()  # Crea una nueva sesión
+       try:
+           yield db  # Usa la sesión
+       finally:
+           db.close()  # Cierra la sesión al terminar
+   
    # Esta función crea una sesión para trabajar con la base de datos, la devuelve mientras haces algo (yield db) y la cierra automáticamente al terminar.
    # Se usa mucho en frameworks como FastAPI para que cada petición tenga su propia sesión limpia.
+   ```
+   Para comprobar que estamos conectados a la base de datos necesitamos que nuestro archivo `main.py` tenga definido el arranque de la aplicación:
 
+   ```python
+   from fastapi import FastAPI
+
+   app = FastAPI()
+   
+   #IMPORTANTE: Aquí referenciamos el archivo "database" no la variable "db"
+   from database import database
+   
+   def run():
+       pass
+   if __name__ == '__main__':
+       database.Base.metadata.create_all(database.engine)
+       run()
+   
+   @app.get("/")
+   async def root():
+       return {"message": "Hello World"}
+   ```
+
+   Y luego en nuestra terminal ejecutamos:
+
+   ```bash
+   uvicorn main:app --reload
    ```
 
 ## 4. Conceptos Fundamentales
