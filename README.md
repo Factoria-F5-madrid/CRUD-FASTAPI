@@ -27,36 +27,36 @@ FastAPI es un moderno y rápido (de alto rendimiento) framework web para constru
 ## 2. Estructura de Archivos y Carpetas
 
 ```plaintext
-book_crud/
-│
-├── main.py                   
-├── config
-│   ├── __init__.py
-│   └── config_variables.py
-|
-├── database
-│   ├── __init__.py
-│   └── database.py
-|                   
-├── models/
-│   ├── __init__.py
-│   └── libro_model.py
-|
-├── schemas
-│   ├── __init__.py
-│   └── libro_schema.py
-|
-├── routes
-│   ├── __init__.py
-│   └── routes.py         
-│
-├── controllers/
-│   ├── __init__.py
-│   └── libro_controller.py   
-│
-├── .env #opcional
-│
-└── db.sqlite3 #Este archivo se creará solo ;)
+   book_crud/
+   │
+   ├── main.py                   
+   ├── config
+   │   ├── __init__.py
+   │   └── config_variables.py
+   |
+   ├── database
+   │   ├── __init__.py
+   │   └── database.py
+   |                   
+   ├── models/
+   │   ├── __init__.py
+   │   └── libro_model.py
+   |
+   ├── schemas
+   │   ├── __init__.py
+   │   └── libro_schema.py
+   |
+   ├── routes
+   │   ├── __init__.py
+   │   └── routes.py         
+   │
+   ├── controllers/
+   │   ├── __init__.py
+   │   └── libro_controller.py   
+   │
+   ├── .env #opcional
+   │
+   └── db.sqlite3 #Este archivo se creará solo ;)
 ```
 
 - `venv/`: Directorio del entorno virtual de Python.
@@ -98,35 +98,35 @@ book_crud/
 
    Crea las carpetas que necesites y dentro los archivos que vayas a utilizar, la arquitectura de tu proyecto puede cambiar, sin embargo recuerda que queremos **escalabilidad**, por lo que necesitamos dividir la lógica de los distintos servicios, y la conexiones con otras partes de la aplicación, es decir crea las carpetas y archivos (los archivos son los que tienen extensiones como ".py", las carpetas no tienen extensión):
 
-   ```plaintext
-book_crud/
-│
-├── main.py                   
-├── config
-│   ├── __init__.py
-│   └── config_variables.py
-|
-├── database
-│   ├── __init__.py
-│   └── database.py
-|                   
-├── models/
-│   ├── __init__.py
-│   └── libro_model.py
-|
-├── schemas
-│   ├── __init__.py
-│   └── libro_schema.py
-|
-├── routes
-│   ├── __init__.py
-│   └── routes.py         
-│
-├── controllers/
-│   ├── __init__.py
-│   └── libro_controller.py   
-│ 
-└──.env #opcional
+```plaintext
+     book_crud/
+     │
+     ├── main.py                   
+     ├── config
+     │   ├── __init__.py
+     │   └── config_variables.py
+     |
+     ├── database
+     │   ├── __init__.py
+     │   └── database.py
+     |                   
+     ├── models/
+     │   ├── __init__.py
+     │   └── libro_model.py
+     |
+     ├── schemas
+     │   ├── __init__.py
+     │   └── libro_schema.py
+     |
+     ├── routes
+     │   ├── __init__.py
+     │   └── routes.py         
+     │
+     ├── controllers/
+     │   ├── __init__.py
+     │   └── libro_controller.py   
+     │ 
+     └──.env #opcional
 ```
 
 2. Configurar las variables de entorno y usar el diectorio y archivo `config/config_variables.py`:
