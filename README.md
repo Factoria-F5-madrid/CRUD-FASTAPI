@@ -90,8 +90,44 @@ book_crud/
    ```
    pip install fastapi[all] sqlalchemy
    ```
+   si no te permite utilizar `[all]` entonces instala:
 
-   Crea las carpetas que necesites y dentro los archivos que vayas a utilizar, la arquitectura de tu proyecto puede cambiar, sin embargo recuerda que queremos **escalabilidad**, por lo que necesitamos dividir la lógica de los distintos servicios, y la conexiones con otras partes de la aplicación.
+   ```
+   pip install fastapi sqlalchemy uvicorn
+   ```
+
+   Crea las carpetas que necesites y dentro los archivos que vayas a utilizar, la arquitectura de tu proyecto puede cambiar, sin embargo recuerda que queremos **escalabilidad**, por lo que necesitamos dividir la lógica de los distintos servicios, y la conexiones con otras partes de la aplicación, es decir crea las carpetas y archivos (los archivos son los que tienen extensiones como ".py", las carpetas no tienen extensión):
+
+   ```plaintext
+book_crud/
+│
+├── main.py                   
+├── config
+│   ├── __init__.py
+│   └── config_variables.py
+|
+├── database
+│   ├── __init__.py
+│   └── database.py
+|                   
+├── models/
+│   ├── __init__.py
+│   └── libro_model.py
+|
+├── schemas
+│   ├── __init__.py
+│   └── libro_schema.py
+|
+├── routes
+│   ├── __init__.py
+│   └── routes.py         
+│
+├── controllers/
+│   ├── __init__.py
+│   └── libro_controller.py   
+│ 
+└──.env #opcional
+```
 
 2. Configurar las variables de entorno y usar el diectorio y archivo `config/config_variables.py`:
 **Install pydantic_settings**
