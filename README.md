@@ -9,8 +9,9 @@
 5. [Flujo de Trabajo en FastAPI](#5-flujo-de-trabajo-en-fastapi)
 6. [Comandos Esenciales](#6-comandos-esenciales)
 7. [Ejemplo Completo: Aplicación CRUD](#7-ejemplo-completo-aplicación-crud)
-8. [Despliegue en Producción](#8-despliegue-en-producción)
-9. [Recursos Adicionales](#9-recursos-adicionales)
+8. [Probando las Rutas con la Documentación de FastAPI](#8-Probando-las-Rutas-con-la-Documentación-de-FastAPI)
+9. [Despliegue en Producción](#9-despliegue-en-producción)
+10. [Recursos Adicionales](#10-recursos-adicionales)
 
 ---
 
@@ -577,8 +578,102 @@ async def root():
 
 app.include_router(router, prefix="/v1")
 ```
+# 8. Probando las Rutas con la Documentación de FastAPI
 
-## 8. Despliegue en Producción
+FastAPI genera automáticamente documentación interactiva de tu API utilizando Swagger UI. Esto nos permite probar las rutas sin necesidad de usar herramientas externas como Postman.
+
+## Acceder a la documentación
+
+1. Asegúrate de que tu servidor esté corriendo:
+```bash
+uvicorn main:app --reload
+```
+
+2. Abre tu navegador y ve a:
+   - Swagger UI: http://127.0.0.1:8000/docs (Permite editar las peticiones)
+   - ReDoc: http://127.0.0.1:8000/redoc (No permite editar las peticiones)
+
+En Swagger UI podrás ver todas las rutas disponibles, sus métodos, parámetros y modelos de request/response.
+
+## Lista de Rutas y Ejemplos
+
+| Ruta | Método | Descripción | Request Body (JSON) | Respuesta Ejemplo |
+|------|--------|-------------|---------------------|-------------------|
+| `/v1/libros/` | POST | Crear un nuevo libro | `{ "title": "El Quijote", "description": "Novela de Cervantes" }` | `{ "id": 1, "title": "El Quijote", "description": "Novela de Cervantes" }` |
+| `/v1/libros/` | GET | Obtener todos los libros | N/A | `[{"id": 1, "title": "El Quijote", "description": "Novela de Cervantes"}]` |
+| `/v1/libros/{libro_id}` | GET | Obtener un libro por ID | N/A | `{ "id": 1, "title": "El Quijote", "description": "Novela de Cervantes" }` |
+| `/v1/libros/{libro_id}` | PUT | Actualizar un libro por ID | `{ "title": "Don Quijote", "description": "Clásico de la literatura" }` | `{ "id": 1, "title": "Don Quijote", "description": "Clásico de la literatura" }` |
+| `/v1/libros/{libro_id}` | DELETE | Eliminar un libro por ID | N/A | `204 No Content` |
+
+## Cómo usar Swagger UI
+
+1. Haz click en la ruta que quieras probar.
+2. Si la ruta requiere parámetros (`path params`) o un `request body`, completa los campos que se muestran.
+3. Haz click en "Execute" para enviar la petición.
+4. Revisa la respuesta que aparece en la sección Response Body.
+
+**Nota:** Las rutas están prefijadas con `/v1` porque en `main.py` incluimos el router con `app.include_router(router, prefix="/v1")`.
+
+## Ejemplo de prueba manual
+
+### Crear un libro
+
+1. **Ruta:** `POST /v1/libros/`
+2. **Body:**
+```json
+{
+  "title": "Cien años de soledad",
+  "description": "Novela de Gabriel García Márquez"
+}
+```
+
+3. **Resultado esperado:**
+```json
+{
+  "id": 2,
+  "title": "Cien años de soledad",
+  "description": "Novela de Gabriel García Márquez"
+}
+```
+
+### Obtener todos los libros
+
+1. **Ruta:** `GET /v1/libros/`
+2. **No requiere body**
+3. **Resultado esperado:**
+```json
+[
+  { "id": 1, "title": "El Quijote", "description": "Novela de Cervantes" },
+  { "id": 2, "title": "Cien años de soledad", "description": "Novela de Gabriel García Márquez" }
+]
+```
+
+### Actualizar un libro
+
+1. **Ruta:** `PUT /v1/libros/2`
+2. **Body:**
+```json
+{
+  "title": "Cien años de soledad - Edición revisada",
+  "description": "Novela clásica de Gabriel García Márquez"
+}
+```
+
+3. **Resultado esperado:**
+```json
+{
+  "id": 2,
+  "title": "Cien años de soledad - Edición revisada",
+  "description": "Novela clásica de Gabriel García Márquez"
+}
+```
+### Eliminar un libro
+
+1. **Ruta:** `DELETE /v1/libros/2`
+2. **No requiere body**
+3. **Resultado esperado:** `204 No Content`
+
+## 9. Despliegue en Producción
 
 1. Elegir un proveedor de hosting (por ejemplo, Heroku, DigitalOcean, AWS)
 2. Configurar variables de entorno para la base de datos y otras configuraciones sensibles
@@ -586,9 +681,11 @@ app.include_router(router, prefix="/v1")
 4. Configurar un servidor proxy inverso como Nginx (opcional, pero recomendado)
 5. Implementar HTTPS para seguridad
 
-## 9. Recursos Adicionales
+## 10. Recursos Adicionales
 
 - [Documentación oficial de FastAPI](https://fastapi.tiangolo.com/)
 - [Tutorial de SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/tutorial.html)
 - [Guía de despliegue de FastAPI](https://fastapi.tiangolo.com/deployment/)
 - [Curso en video de FastAPI](https://www.youtube.com/watch?v=7t2alSnE2-I)
+- [Versión sin modularizar de un CRUD en fastAPI](https://www.youtube.com/watch?v=mIWCy93--tI)
+- [Versión modularizada de un CRUD en FastAPI](https://www.youtube.com/watch?v=N5VjIqAsDQ8)
