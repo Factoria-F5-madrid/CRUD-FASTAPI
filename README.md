@@ -93,7 +93,7 @@ pip install fastapi[all] sqlalchemy
 si no te permite utilizar `[all]` entonces instala:
 
 ```
-pip install fastapi sqlalchemy uvicorn
+pip install fastapi sqlalchemy uvicorn pymysql
 ```
 
 Crea las carpetas que necesites y dentro los archivos que vayasa utilizar, la arquitectura de tu proyecto puede cambiar, sinembargo recuerda que queremos **escalabilidad**, por lo quenecesitamos dividir la lógica de los distintos servicios, y laconexiones con otras partes de la aplicación, es decir crea lascarpetas y archivos (los archivos son los que tienen extensionescomo ".py", las carpetas no tienen extensión):
@@ -139,12 +139,6 @@ book_crud/
    pip install pydantic-settings
    ```
 
-   Ahora para guardar estas dependencias con sus versiones en un archivo `requirements.txt` hacemos:
-
-   ```bash
-   pip freeze >> requirements.txt
-   ```
-
    Nos dirigimos al directorio `config/` y dentro de esta carpeto nos dirigimos al archivo `config_variables.py` y escribimos:
     
     ```python
@@ -164,6 +158,12 @@ book_crud/
     ```python
     pip install python-dotenv
     ```
+
+   Ahora para guardar estas dependencias con sus versiones en un archivo `requirements.txt` hacemos:
+
+   ```bash
+   pip freeze >> requirements.txt
+   ```
    Luego en tu archivo `.env`:
    
     ```python
@@ -193,7 +193,7 @@ book_crud/
    ```
    
 
-4. Configurar la base de datos en `database/database.py`:
+4. Configurar la base de datos en `database/database.py` y en `MySQL Workbench`:
    ```python
    # database/database.py
    
@@ -231,6 +231,43 @@ book_crud/
    # Esta función crea una sesión para trabajar con la base de datos, la devuelve mientras haces algo (yield db) y la cierra automáticamente al terminar.
    # Se usa mucho en frameworks como FastAPI para que cada petición tenga su propia sesión limpia.
    ```
+   
+   ### Creamos nuestra conexión en Workbech
+
+   <img width="1028" height="451" alt="image" src="https://github.com/user-attachments/assets/3b3dabab-5b60-4021-bd21-df190734bd12" />
+   <img width="1150" height="610" alt="image" src="https://github.com/user-attachments/assets/0e28d86d-f226-4ac7-9459-6461daf7a07a" />
+
+   Ahora entramos a la conexión y creamos una base de datos
+   
+   <img width="808" height="338" alt="image" src="https://github.com/user-attachments/assets/46230438-0d49-4181-aeb8-f97e230d7a4f" />
+   
+   Nos aseguramos de estar en `schemas` y no en `Administration`
+   
+   <img width="347" height="600" alt="image" src="https://github.com/user-attachments/assets/d251d4fd-2b12-4f4a-ad36-86760de9da76" />
+   
+   Creamos la base de datos
+   
+   <img width="887" height="580" alt="image" src="https://github.com/user-attachments/assets/f648e24a-6747-4baf-9d7b-37ea987870a9" />
+
+   Le ponemos como nombre `book_crud` y hacemos click en el botón `apply` que está al final de esa vista:
+   
+   <img width="735" height="461" alt="image" src="https://github.com/user-attachments/assets/aea823d8-a415-4388-9526-e8f29893a35e" />
+   <img width="671" height="419" alt="image" src="https://github.com/user-attachments/assets/55e2d801-e486-48e0-ba29-db83decc94c9" />
+
+   Si no ves tu base de datos, o que haya habido alg[un cambio, refresca haciendo click en estas flechas:
+   
+   <img width="360" height="495" alt="image" src="https://github.com/user-attachments/assets/80aa8a20-ca1f-4a91-b141-71ac7931aabf" />
+
+   Hacemos click derecho sobre la opción `tables` (la cual está dentro de book_crud en el menú lateral), y hacemos click en `create table` para así crear una nueva tabla:
+   
+   <img width="668" height="612" alt="image" src="https://github.com/user-attachments/assets/a3a158a1-9114-40f7-9ace-d1b1eae6463e" />
+
+   A la tabla le colocaremos como nombre `libros` y sus atributos serán `id`, `title`, `description` y volvemos a hacer click en `apply`:
+   
+   <img width="1596" height="273" alt="image" src="https://github.com/user-attachments/assets/6888c96c-1006-473b-a1c6-2cdd48a41af8" />
+
+   ### Comprobamos que estamos correctamente conectados a la base de datos
+
    Para comprobar que estamos conectados a la base de datos necesitamos que nuestro archivo `main.py` tenga definido el arranque de la aplicación:
 
    ```python
@@ -293,21 +330,21 @@ book_crud/
 
 ## 7. Ejemplo Completo: Aplicación CRUD
 
-### Modelos (`models/crud_model.py`)
+### Modelos (`models/libro_model.py`)
 
 ```python
 from sqlalchemy import Column, Integer, String
-from .database import Base
+from database.database import Base
 
-class Item(Base):
-    __tablename__ = "items"
+class Libro(Base):
+    __tablename__ = "libros"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
+    id = Column(Integer, primary_key=True)
+    title = Column(String, index=True, nullable=False)
     description = Column(String, index=True)
 ```
 
-### Schemas (`schemas/crud_schema.py`)
+### Schemas (`schemas/libro_schema.py`)
 
 ```python
 from pydantic import BaseModel
@@ -316,118 +353,122 @@ from pydantic import BaseModel
 # Se usa cuando el usuario envía datos para crear un item.
 # “pass” significa que no añadimos nada nuevo, solo usamos lo que está en ItemBase.
 
-class ItemBase(BaseModel):
+class LibroBase(BaseModel):
     title: str
     description: str = None
 
-class ItemCreate(ItemBase):
+class LibroCreate(LibroBase):
     pass
 
-class Item(ItemBase): # Hereda de ItemBase (title y description) y añade el id que ya existe en la base de datos.
+class Libro(LibroBase): # Hereda de ItemBase (title y description) y añade el id que ya existe en la base de datos.
     id: int
 
     class Config:
         orm_mode = True # permite que Pydantic lea directamente objetos de SQLAlchemy como si fueran diccionarios, para enviarlos en respuestas JSON.
 ```
 
-### Operaciones CRUD (`controllers/crud_controller.py`)
+### Operaciones CRUD (`controllers/libro_controller.py`)
 
 ```python
 from sqlalchemy.orm import Session
-from schemas import crud_schema
-from models.curd_model import Item
+from schemas import libro_schema
+from models.libro_model import Libro
 
 class CrudControllers:
 
-'''
-Si no usaramos @static methos tendriamos que escribir:
+    '''
+    Si no usaramos @static methos tendriamos que escribir:
 
-def __init__(self, db: Session): # El trabajador ya tiene su caja de herramientas (self.db) y no necesita traer nada externo cada vez.
-        self.db = db
+    def __init__(self, db: Session): # El trabajador ya tiene su caja de herramientas (self.db) y no necesita traer nada externo cada vez.
+            self.db = db
 
-y el controlador se vería así:
+    y el controlador se vería así:
 
- def create_item(self, item: crud_schema.ItemCreate): # No hace falta pasar db:session cada vez
-        db_item = Item(**item.dict())
-        self.db.add(db_item)
-        self.db.commit()
-        self.db.refresh(db_item)
-        return db_item
-'''
+    def create_item(self, item: crud_schema.ItemCreate): # No hace falta pasar db:session cada vez
+            db_item = Item(**item.dict())
+            self.db.add(db_item)
+            self.db.commit()
+            self.db.refresh(db_item)
+            return db_item
+    '''
 
     @staticmethod
-    async def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Item).offset(skip).limit(limit).all()
+    def get_Libros(db: Session):
+        return db.query(Libro).all()
 
     @staticmethod # Cada función es como un trabajador independiente que llega con su propio conjunto de herramientas (db) y hace su tarea.
-    async def get_item(db: Session, item_id: int):
-        return db.query(Item).filter(Item.id == item_id).first()
+    def get_Libro_by_id(db: Session, Libro_id: int):
+        return db.query(Libro).filter(Libro.id == Libro_id).first()
 
     @staticmethod
-    async def create_item(db: Session, item: crud_schema.ItemCreate):
-        db_item = Item(**item.dict())
-        db.add(db_item)
+    def create_Libro(db: Session, libro: libro_schema.LibroCreate):
+        db_libro = Libro(**libro.dict())  # libro.dict() funciona porque es un Pydantic model
+        db.add(db_libro)
         db.commit()
-        db.refresh(db_item)
-        return db_item
+        db.refresh(db_libro)
+        return db_libro
 
-   @staticmethod
-   async def update_item(db: Session, item_id: int, item: crud_schema.ItemCreate):
-       db_item = db.query(Item).filter(Item.id == item_id).first()
-       if db_item:
-           db_item.title = item.title
-           db_item.description = item.description
-           db.commit()
-           db.refresh(db_item)
-       return db_item
+    @staticmethod
+    def update_Libro(db: Session, Libro_id: int, libro: libro_schema.LibroCreate):
+        db_Libro = db.query(Libro).filter(Libro.id == Libro_id).first()
+        if db_Libro:
+            db_Libro.title = libro.title 
+            db_Libro.description = libro.description
+            db.commit()
+            db.refresh(db_Libro)
+        return db_Libro
    
-   @staticmethod
-   async def delete_item(db: Session, item_id: int):
-       db_item = db.query(Item).filter(Item.id == item_id).first()
-       if db_item:
-           db.delete(db_item)
-           db.commit()
-       return db_item
+    @staticmethod
+    def delete_Libro(db: Session, Libro_id: int):
+        db_Libro = db.query(Libro).filter(Libro.id == Libro_id).first()
+        if db_Libro:
+            db.delete(db_Libro)
+            db.commit()
+        return {"message": "Libro eliminado exitosamente"}
 ```
 
 **También** nuestros controladores pueden ser funciones independientes, no tienen por qué estar dentro de una clase:
 
 ```python
 from sqlalchemy.orm import Session
-from models.curd_model import Item
-from schemas import crud_schema
+from schemas import libro_schema
+from models.libro_model import Libro
 
-def create_item(db: Session, item: crud_schema.ItemCreate):
-    db_item = Item(**item.dict())
-    db.add(db_item)
+def get_Libros(db: Session):
+    return db.query(Libro).all()
+
+def get_Libro_by_id(db: Session,Libro_id: int):
+    return db.query(Libro).filter(Libro.id == Libro_id).first()
+
+
+def create_Libro(db: Session, libro:libro_schema.LibroCreate):
+    db_libro = Libro(**libro.dict()) # libro.dict() funciona porque esun Pydantic model
+    db.add(db_libro)
     db.commit()
-    db.refresh(db_item)
-    return db_item
+    db.refresh(db_libro)
+    return db_libro
 
-def get_item(db: Session, item_id: int):
-    return db.query(Item).filter(Item.id == item_id).first()
 
-def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Item).offset(skip).limit(limit).all()
-
-def update_item(db: Session, item_id: int, item: crud_schema.ItemCreate):
-    db_item = db.query(Item).filter(Item.id == item_id).first()
-    if db_item:
-        db_item.title = item.title
-        db_item.description = item.description
+def update_Libro(db: Session,Libro_id: int, libro: libro_schemaLibroCreate):
+    db_Libro = db.query(Libro).filte(Libro.id == Libro_id).first()
+    if db_Libro:
+        db_Libro.title = libro.title 
+        db_Libro.description = librodescription
         db.commit()
-        db.refresh(db_item)
-    return db_item
+        db.refresh(db_Libro)
+    return db_Libro
+   
 
-def delete_item(db: Session, item_id: int):
-    db_item = db.query(Item).filter(Item.id == item_id).first()
-    if db_item:
-        db.delete(db_item)
+def delete_Libro(db: Session,Libro_id: int):
+    db_Libro = db.query(Libro).filte(Libro.id == Libro_id).first()
+    if db_Libro:
+        db.delete(db_Libro)
         db.commit()
-    return db_item
+    return {"message": "Libroeliminado exitosamente"}
 ```
 
-### Rutas de la API (`routes/crud_routes.py`)
+### Rutas de la API (`routes/routes.py`)
+
 ```python
 from fastapi import APIRouter, Depends
 from fastapi import status
@@ -478,30 +519,43 @@ def delete_item(item_id: int, db: Session = Depends(get_db)):
 Si definimos los controladores como funciones en lugar de una clase, entonces nuestras rutas se van a ver de esta manera:
 
 ```python
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+
+from controllers.libro_controller import CrudControllers
+from schemas.libro_schema import LibroBase, LibroCreate, Libro
 from database.database import get_db
-from schemas import crud_schema
-from crud_controller import create_item, get_item, get_items, update_item, delete_item
 
 router = APIRouter()
 
-@router.post("/items/", response_model=crud_schema.Item)
-def new_item(item: crud_schema.ItemCreate, db: Session = Depends(get_db)):
-    return create_item(db, item)
+@router.post("/libros/", response_model=LibroBase, status_code=status.HTTP_201_CREATED)
+async def new_libro(libro: LibroCreate, db: Session = Depends(get_db)):
+    libro = CrudControllers.create_Libro(db,libro)
+    return libro
 
-@router.get("/items/{item_id}", response_model=crud_schema.Item)
-def read_item(item_id: int, db: Session = Depends(get_db)):
-    db_item = get_item(db, item_id)
-    if db_item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return db_item
+@router.get("/libros/{libro_id}", response_model=LibroBase)
+def get_libro(libro_id: int, db: Session = Depends(get_db)):
+    libro = CrudControllers.get_Libro_by_id(db, libro_id)
+    if not libro:
+        raise HTTPException(status_code=404, detail="Libro no encontrado")
+    return libro
 
-# Resto de rutas: get_items, update_item, delete_item
+@router.put("/libros/{libro_id}", response_model=LibroBase)
+def update_Libro(libro_id: int, libro: LibroCreate, db: Session = Depends(get_db)):
+    updated = CrudControllers.update_Libro(db, libro_id, libro)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Libro no encontrado")
+    return updated
+
+@router.delete("/libros/{libro_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_libro(libro_id: int, db: Session = Depends(get_db)):
+    deleted = CrudControllers.delete_Libro(db, libro_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Libro no encontrado")
 ```
 
-### Archivo principal app.py (`app.py`)
+### Archivo principal main.py (`main.py`)
 ```python
 from fastapi import FastAPI
 from routes.routes import router
@@ -523,7 +577,6 @@ async def root():
 
 app.include_router(router, prefix="/v1")
 ```
-
 
 ## 8. Despliegue en Producción
 
